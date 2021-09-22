@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Google Site Tool</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="container text-center">
+  <div class="card bg-light text-dark">
+    <dir class="card-header text-center bg-info">
+      <h1>Google Site Tool</h1>
+    </dir>
+    <div class="card-body">
+      <form class="was-validated" enctype="multipart/form-data">
+      <div class="form-group ">
+        <input type="file" class="form-control-file border" id="uploadFile" required>
+        <div class="valid-feedback text-left">Valid.</div>
+        <div class="invalid-feedback text-left">Please fill out this field.</div> 
+      </div>
+      <div class="text-left form-group">
+        <input id="btn-import" class="btn btn-primary" type="button" name="import" value="Import File" disabled>
+        <input id="btn-run" class="btn btn-warning" type="button" name="export" value="Run GoogleSite" disabled> 
+        <input id="btn-export" class="btn btn-success" type="button" name="export" value="Export File" disabled>   
+      </div>
+      
+    </form>
+    </div>
+  </div>
+</div>  
+  <script>
+    $(document).ready(function(){
+      
+      $('#uploadFile').change(function(){
+        const fileExt = ['csv'];
+        if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExt) == -1 ) {
+          $('.invalid-feedback').show()
+          $('.valid-feedback').hide()
+        } else {
+          $('.invalid-feedback').hide()
+          $('.valid-feedback').show()
+          $('#btn-import').prop("disabled", false);
+          $('#btn-run').prop("disabled", true);
+          $('#btn-export').prop("disabled", true);
+        }
+      })
+      $('#btn-import').on('click', function(){
+          let formData = new FormData();
+          const fileUpload = $('#uploadFile').prop('files')[0];
+          formData.append('fileUpload', fileUpload);
+          $.ajax({
+            method: 'POST',
+            url: '/import',
+            data: formData,
+            cache: false,
+            processData: false,
+            contentType: false,
+            success: function (msg) {
+              alert("Data Berhasil Diupload");
+              $('#btn-import').prop("disabled", true);
+              $('#btn-run').prop("disabled", false);
+              $('#btn-export').prop("disabled", true);
+            },
+            error: function () {
+              alert("Data Gagal Diupload");
+            }
+          })
+      })
+      $('#btn-run').on("click", function(){
+        $.ajax({
+          method:'GET',  
+          url: '/gsite',
+          cache: false,
+          processData: false,
+          contentType: false,
+          success: function(msg) {
+            alert("Proses Berhasil Dijalankan");
+            $('#btn-import').prop("disabled", true);
+            $('#btn-run').prop("disabled", true);
+            $('#btn-export').prop("disabled", false);
+          },
+          error: function() {
+            alert('Proses Gagal dijalankan')
+          }
+        })
+      })
+      $('#btn-export').on("click", function(){
+        $.ajax({
+          method:'GET',  
+          url: '/export',
+          cache: false,
+          processData: false,
+          contentType: false,
+          success: function(msg) {
+            alert("Export Berhasil Dijalankan");
+            $('#btn-import').prop("disabled", true);
+            $('#btn-run').prop("disabled", true);
+            $('#btn-export').prop("disabled", false);
+          },
+          error: function() {
+            alert('Export Gagal dijalankan')
+          }
+        })
+      })
+    });
+    
+  </script>
+</body>
+</html>
